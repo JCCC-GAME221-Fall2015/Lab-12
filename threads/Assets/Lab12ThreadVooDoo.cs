@@ -15,7 +15,18 @@ public class Lab12ThreadVooDoo : MonoBehaviour {
     #endregion
 
     void Start() {
-        Start6();
+        Start7();
+    }
+
+    void Start7() {
+        string text = "t1";
+        Thread t1 = new Thread(() => print(text));
+
+        text = "t2";
+        Thread t2 = new Thread(() => print(text));
+
+        t1.Start();
+        t2.Start();
     }
 
     void Start6() {
