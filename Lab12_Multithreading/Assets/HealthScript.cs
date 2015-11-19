@@ -17,7 +17,7 @@ public class HealthScript : MonoBehaviour {
 	
 	}
 
-	void UpdateUIHealth(int dmg)
+	public void UpdateUIHealth(int dmg)
 	{
 		health -= dmg;
 		uiText.text = health.ToString();
