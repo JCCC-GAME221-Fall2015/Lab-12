@@ -27,21 +27,31 @@ public class MovementScript : MonoBehaviour {
 	Vector3 startPos;
 	Vector3 endPos;
 	float startTime;
+	float timeDelta;
+	bool hasUpdated = true;
+    bool isRunning = true;
+
+	ThreadStart moveThread;
+	Thread thread;
 
 	// Use this for initialization
 	void Start () {
-		ThreadStart moveThread = new ThreadStart (MoveObject);
-
-		Thread thread = new Thread (moveThread);
-
-		thread.Start ();
+		startPos = transform.position;
 
 		InvokeRepeating ("DirectionChange", 0f, directionChangeTime);
+		
+		moveThread = new ThreadStart (MoveObject);
+
+		thread = new Thread (moveThread);
+
+		thread.Start ();
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
-	
+		timeDelta = Time.time;
+		transform.position = positionHold;
+		hasUpdated = true;
 	}
 
 	void OnTriggerEnter(Collider other)
@@ -53,8 +63,14 @@ public class MovementScript : MonoBehaviour {
 
 	void MoveObject()
 	{
-		while (true) {
-			transform.Translate(moveX * Time.deltaTime, 0, moveZ * Time.deltaTime);
+		while (isRunning) 
+		{
+			if(hasUpdated)
+			{
+				float capturedDelta = (timeDelta - startTime)/ directionChangeTime;
+				positionHold = Vector3.Lerp(startPos, endPos, capturedDelta * moveSpeed);
+				hasUpdated = false;
+			}
 		}
 	}
 
@@ -68,7 +84,6 @@ public class MovementScript : MonoBehaviour {
 		}
 
 		moveX = moveZ = 0;
-		//startTime = System.DateTime.
 
 		switch ((Directions)next) {
 			case Directions.NORTH:
@@ -86,16 +101,21 @@ public class MovementScript : MonoBehaviour {
 			default:
 				break;
 		}
+
+		startPos = transform.position;
+		startTime = timeDelta = Time.time;
+		endPos = startPos + new Vector3 (moveX, 0, moveZ);
+		hasUpdated = true;
 	}
 
-	float GetTime()
+	void OnApplicationQuit()
 	{
-		TimeSpan elapsedTime = new TimeSpan(125000);
-		float floatTimeSpan;
-		int secs, msecs;
-		secs = elapsedTime.Seconds;
-		msecs = elapsedTime.Milliseconds;
-		floatTimeSpan = (float)seconds + ((float)milliseconds / 1000);
-		return floatTimeSpan;
+        isRunning = false;
+
+        if (thread != null) {
+			thread.Abort ();
+				Debug.Log ("Thread aborted.");
+		}
+
 	}
 }
