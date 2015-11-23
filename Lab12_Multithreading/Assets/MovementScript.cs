@@ -23,6 +23,11 @@ public class MovementScript : MonoBehaviour {
 
 	public float directionChangeTime = 5f;
 
+	Vector3 positionHold;
+	Vector3 startPos;
+	Vector3 endPos;
+	float startTime;
+
 	// Use this for initialization
 	void Start () {
 		ThreadStart moveThread = new ThreadStart (MoveObject);
@@ -31,7 +36,7 @@ public class MovementScript : MonoBehaviour {
 
 		thread.Start ();
 
-		InvokeRepeating ("DirectionChange", directionChangeTime, directionChangeTime);
+		InvokeRepeating ("DirectionChange", 0f, directionChangeTime);
 	}
 	
 	// Update is called once per frame
@@ -63,6 +68,7 @@ public class MovementScript : MonoBehaviour {
 		}
 
 		moveX = moveZ = 0;
+		//startTime = System.DateTime.
 
 		switch ((Directions)next) {
 			case Directions.NORTH:
@@ -80,5 +86,16 @@ public class MovementScript : MonoBehaviour {
 			default:
 				break;
 		}
+	}
+
+	float GetTime()
+	{
+		TimeSpan elapsedTime = new TimeSpan(125000);
+		float floatTimeSpan;
+		int secs, msecs;
+		secs = elapsedTime.Seconds;
+		msecs = elapsedTime.Milliseconds;
+		floatTimeSpan = (float)seconds + ((float)milliseconds / 1000);
+		return floatTimeSpan;
 	}
 }
